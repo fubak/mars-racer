@@ -9,6 +9,8 @@ npm run dev
 
 Then open http://127.0.0.1:5173/
 
+The published build is at https://fubak.github.io/mars-racer/
+
 W A S D drive, Space slides, R resets.
 
 The truck mesh is [Tesla Cybertruck](https://skfb.ly/6QSBr) by hashikemu, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).

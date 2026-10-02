@@ -23,7 +23,7 @@ export function createHud(root: HTMLElement, race: Race, shot: string | null): H
     <div class="hud-lap"><span id="lap">LAP 1</span><strong id="time">0:00.0</strong><span id="best"></span></div>
     <div class="hud-help">W A S D drive · SPACE slide · R reset</div>
     <canvas id="map" width="168" height="168"></canvas>
-    <a class="progress-link" href="/progress.html">progress</a>
+    <a class="progress-link" href="${import.meta.env.BASE_URL}progress.html">progress</a>
     <div class="hud-credit">Truck model by hashikemu, CC BY 4.0</div>
   `
   root.style.display = hidden ? 'none' : 'block'

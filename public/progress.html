@@ -27,7 +27,7 @@
   <body>
     <h1>MARS RACER</h1>
     <p class="note" id="note">Loading progress…</p>
-    <p><a href="/?shot=hero&t=8">Open the sim</a></p>
+    <p><a href="./?shot=hero&t=8">Open the sim</a></p>
     <div class="shots" id="shots"></div>
     <ul id="list"></ul>
     <script>
@@ -37,7 +37,7 @@
         const fig = document.createElement('figure')
         const img = document.createElement('img')
         img.alt = name
-        img.src = '/shots/' + name + '.png?v=' + Date.now()
+        img.src = 'shots/' + name + '.png?v=' + Date.now()
         img.addEventListener('error', () => fig.remove())
         const cap = document.createElement('figcaption')
         cap.textContent = name
@@ -45,7 +45,7 @@
         shotRoot.append(fig)
       }
       async function load() {
-        const res = await fetch('/progress.json?v=' + Date.now())
+        const res = await fetch('progress.json?v=' + Date.now())
         const data = await res.json()
         document.querySelector('#note').textContent = 'Wave ' + data.wave + ' · ' + data.note
         const list = document.querySelector('#list')

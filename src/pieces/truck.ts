@@ -11,7 +11,7 @@ export type Truck = {
 
 // "Tesla Cybertruck" by hashikemu, CC BY 4.0.
 // https://skfb.ly/6QSBr
-const MODEL_URL = '/models/cybertruck.gltf'
+const MODEL_URL = `${import.meta.env.BASE_URL}models/cybertruck.gltf`
 
 export function createTruck(scene: THREE.Scene): Truck {
   const group = new THREE.Group()
