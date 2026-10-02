@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mars Racer — progress</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&family=Barlow:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      :root { color-scheme: dark; background: #140c09; color: #f4ece4; font-family: Barlow, sans-serif; }
+      body { margin: 0; padding: 32px 28px 64px; }
+      h1 { font-family: "Barlow Condensed", sans-serif; font-weight: 600; letter-spacing: 0.18em; font-size: 28px; margin: 0 0 8px; }
+      a { color: #ffb07a; }
+      .note { opacity: 0.75; max-width: 640px; }
+      .shots { display: flex; gap: 12px; flex-wrap: wrap; margin: 22px 0; }
+      .shots figure { margin: 0; width: min(320px, 100%); }
+      .shots img { width: 100%; height: 180px; object-fit: cover; background: #2a1812; display: block; }
+      .shots figcaption { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.7; margin-top: 6px; }
+      ul { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 10px; }
+      li { display: grid; grid-template-columns: 180px 1fr auto; gap: 12px; align-items: baseline; padding: 12px 0; border-top: 1px solid rgba(255,255,255,0.08); }
+      .status { letter-spacing: 0.14em; text-transform: uppercase; font-size: 12px; color: #ffb07a; }
+      .gap { opacity: 0.8; font-size: 14px; }
+      @media (max-width: 720px) {
+        li { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>MARS RACER</h1>
+    <p class="note" id="note">Loading progress…</p>
+    <p><a href="/?shot=hero&t=8">Open the sim</a></p>
+    <div class="shots" id="shots"></div>
+    <ul id="list"></ul>
+    <script>
+      const shots = ['hero', 'truck', 'terrain', 'sky', 'dust']
+      const shotRoot = document.querySelector('#shots')
+      for (const name of shots) {
+        const fig = document.createElement('figure')
+        const img = document.createElement('img')
+        img.alt = name
+        img.src = '/shots/' + name + '.png?v=' + Date.now()
+        img.addEventListener('error', () => fig.remove())
+        const cap = document.createElement('figcaption')
+        cap.textContent = name
+        fig.append(img, cap)
+        shotRoot.append(fig)
+      }
+      async function load() {
+        const res = await fetch('/progress.json?v=' + Date.now())
+        const data = await res.json()
+        document.querySelector('#note').textContent = 'Wave ' + data.wave + ' · ' + data.note
+        const list = document.querySelector('#list')
+        list.replaceChildren()
+        for (const piece of data.pieces) {
+          const li = document.createElement('li')
+          const title = document.createElement('strong')
+          title.textContent = piece.title
+          const gap = document.createElement('span')
+          gap.className = 'gap'
+          gap.textContent = piece.gap || piece.critic
+          const status = document.createElement('span')
+          status.className = 'status'
+          status.textContent = piece.status + ' · r' + piece.round
+          li.append(title, gap, status)
+          list.append(li)
+        }
+      }
+      load()
+      setInterval(load, 2000)
+    </script>
+  </body>
+</html>
