@@ -1,47 +1,59 @@
 {
-  "loop": "running",
-  "stoppedBecause": null,
+  "loop": "stopped",
+  "focus": "rest of the game",
+  "stoppedBecause": "The user asked to commit and push after round 916. No wake is armed.",
   "resumeWhen": "The user asks to continue the critic loop.",
-  "nextRound": 868,
-  "lastRound": 867,
-  "updatedAt": "2026-10-04T15:56:20-04:00",
+  "nextRound": 917,
+  "lastRound": 916,
+  "updatedAt": "2026-10-04T19:33:15-04:00",
   "devServer": "http://127.0.0.1:5173/",
   "progressPage": "http://127.0.0.1:5173/progress.html",
   "shotUrls": [
-    "http://127.0.0.1:5173/?shot=truck&t=0",
-    "http://127.0.0.1:5173/?shot=hero&t=8"
+    "http://127.0.0.1:5173/?shot=sky&t=0",
+    "http://127.0.0.1:5173/?shot=terrain",
+    "http://127.0.0.1:5173/?shot=dust&t=8",
+    "http://127.0.0.1:5173/?shot=hud&t=8"
   ],
   "chrome": {
     "debugger": "http://127.0.0.1:9222/json/list",
     "lastGameTabId": "863A2A03BA7061464ABE62CC031E4751",
-    "lastProgressTabId": "389B6C91195176B8C393B86DBBF07923",
+    "lastProgressTabId": "48E7CEABD3B65EC8EE17B150FF466B75",
     "note": "Confirm the game tab from json/list before connecting. Do not launch Chrome on 9222."
   },
-  "lastTruck": {
+  "truckMesh": "closed",
+  "lastSky": {
     "ready": true,
-    "shot": "truck",
-    "speed": 0,
-    "slip": 0,
-    "x": 300.5992681111612,
-    "z": 68.57956149109027,
-    "heading": 2.0994020364340997,
-    "doorRowY": 576,
-    "doorRunPx": 106,
-    "doorColor": [111, 79, 57],
-    "longestRunPx": 343,
-    "longestRunY": 654,
-    "longestRunColor": [115, 78, 49]
+    "shot": "sky",
+    "blueRowY": 660,
+    "leftAvg": [181, 150, 130],
+    "rightAvg": [157, 178, 203],
+    "rightBluePx": 160,
+    "rightSamplePx": 160
   },
-  "lastHero": {
+  "lastTerrain": {
     "ready": true,
-    "shot": "hero",
-    "speed": 39.61030163787044,
-    "speedSpoken": "about 40 m/s",
+    "shot": "terrain",
+    "flat": true,
+    "min": [173, 151, 134],
+    "max": [201, 179, 161]
+  },
+  "lastDust": {
+    "ready": true,
+    "shot": "dust",
+    "speed": 39.4450442584171,
+    "speedSpoken": "about 39 m/s",
     "slip": 0,
     "pose": "tailgate",
-    "x": 147.41983397342594,
-    "z": 182.6059162693497,
-    "heading": 2.825131649393669
+    "tracks": "two dark tracks"
   },
-  "wakePrompt": "Continue the Mars racer critic cycle. Screenshot http://127.0.0.1:5173/?shot=truck&t=0 and ?shot=hero&t=8 yourself and look at the pixels. Do not trust builder summaries. The truck is the hashikemu glTF. Do not replace that loader. Do not revert src/vehicle.ts. The door row is still one flat shade; do not send a roughness pass on the material named body, and do not start a second writer if truck.ts is being edited. Update public/progress.json."
+  "lastHud": {
+    "ready": true,
+    "shot": "hud",
+    "speed": 39.67996421694902,
+    "speedText": "143",
+    "lap": "LAP 1 · GATE 6/8",
+    "time": "0:08.2",
+    "credit": "Truck model by hashikemu, CC BY 4.0"
+  },
+  "wakePrompt": "Continue the Mars racer critic cycle on the rest of the game. The truck mesh is closed: do not measure the door row, do not edit src/pieces/truck.ts, do not revert src/vehicle.ts, and do not send a roughness pass on the material named body. Screenshot http://127.0.0.1:5173/?shot=sky&t=0 and ?shot=terrain and ?shot=dust&t=8 and ?shot=hud&t=8 yourself and look at the pixels. The terrain overview is a flat beige field. The sky shot has a blue horizon band on the right. Update public/progress.json."
 }

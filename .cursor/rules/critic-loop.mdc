@@ -7,8 +7,8 @@ alwaysApply: true
 
 Read `docs/critic-handoff.md` and `public/critic-state.json` before continuing the critic loop.
 
-The user resumed the loop on 2026-10-04. Resume only when the user asks to continue it, or when the armed wake says to continue. Then run one round: capture both shot URLs, measure the door row, look at the frames, rewrite `public/progress.json`, copy the shots, and arm exactly one 180-second wake.
+The truck mesh is closed. The loop is stopped after round 916. Resume only when the user asks. Then run one round on the rest of the game: capture sky, terrain, dust, and HUD, measure the sky band and the terrain overview, look at the frames, rewrite `public/progress.json`, copy the shots, and arm exactly one 180-second wake.
 
-Do not replace the hashikemu glTF loader in `src/pieces/truck.ts`. Do not revert `src/vehicle.ts`. Do not send a roughness pass on the material named `body`. Do not start a second writer while `truck.ts` is being edited. A flat door row of about 104–110 pixels of rgb(111, 79, 57) is the known open gap; do not send a builder for it.
+Do not edit `src/pieces/truck.ts`. Do not revert `src/vehicle.ts`. Do not send a roughness pass on the material named `body`. Do not measure the door row. A flat door row of about 104–110 pixels of rgb(111, 79, 57) is closed; do not send a builder for it.
 
 Judge pixels. Ignore vision-model claims that the truck is hovering. Do not commit unless asked.

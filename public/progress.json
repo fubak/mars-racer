@@ -1,79 +1,79 @@
 {
-  "updatedAt": "2026-10-04T15:56:20-04:00",
-  "wave": 6,
-  "note": "The door row is still flat. A side-shot row is about 106 pixels of rgb(111, 79, 57). The chase frame shows the tailgate, two tracks, and dust at about 40 m/s.",
+  "updatedAt": "2026-10-04T19:33:15-04:00",
+  "wave": 7,
+  "note": "The truck mesh is closed. The terrain overview is a flat beige field. The sky shot has a blue horizon band on the right. Dust, the HUD, and the chase still hold.",
   "pieces": [
     {
       "id": "sky",
       "title": "Martian sky and sun",
-      "status": "streaks in",
-      "round": 9,
-      "critic": "seam gone",
-      "gap": "The hard vertical seam is gone. Streaks still read, and a blue band stays on the left."
+      "status": "blue right",
+      "round": 916,
+      "critic": "loses",
+      "gap": "In the sky shot, the horizon row y=660 is rust on the left and a solid blue band on the right, about rgb(157, 178, 203)."
     },
     {
       "id": "terrain",
       "title": "Regolith, craters, rocks",
-      "status": "textured",
-      "round": 11,
-      "critic": "holds",
-      "gap": "Near sand shows the Grok Imagine regolith. Rocks stop the truck."
+      "status": "blank overview",
+      "round": 916,
+      "critic": "loses",
+      "gap": "The terrain shot is one beige field. Sampled colors only span about rgb(173, 151, 134) to rgb(201, 179, 161). Near sand in the chase still shows the photo."
     },
     {
       "id": "truck",
       "title": "Cybertruck mesh",
-      "status": "flat door",
-      "round": 867,
-      "critic": "loses",
-      "gap": "The hashikemu mesh holds and the tires meet the sand. A door row is still about 106 pixels of one color, rgb(111, 79, 57)."
+      "status": "parked",
+      "round": 916,
+      "critic": "closed",
+      "gap": "The hashikemu mesh stays. The flat door row is a closed topic."
     },
     {
       "id": "drive",
       "title": "Weight, grip, camera",
       "status": "weighted",
-      "round": 5,
+      "round": 916,
       "critic": "holds",
-      "gap": "A and left steer left. D and right steer right. Full throttle still reaches about 15 m/s in two simulated seconds."
+      "gap": "The dust chase is slip 0 and the tailgate, at about 39 m/s (measured 39.445). The HUD frame is back at about 40 m/s."
     },
     {
       "id": "dust",
       "title": "Wheel dust and tracks",
       "status": "tracks in",
-      "round": 4,
+      "round": 916,
       "critic": "holds",
-      "gap": "Two dark tracks sit behind the tires in the chase frame."
+      "gap": "Two dark tracks sit behind the tires in the dust shot, with sparks off the left rear."
     },
     {
       "id": "grade",
       "title": "Shadows, grade, bloom",
       "status": "beams in",
-      "round": 5,
+      "round": 916,
       "critic": "holds",
-      "gap": "Headlights light the sand and the tail lamp shows in the chase frame."
+      "gap": "The tail lamp and the red pool on the sand show in the dust shot."
     },
     {
       "id": "race",
       "title": "Loop, gates, timing",
-      "status": "glow gone",
-      "round": 2,
+      "status": "counting",
+      "round": 916,
       "critic": "holds",
-      "gap": "Eight gates on the Jezero ellipse."
+      "gap": "The HUD reads lap 1, gate 6/8, at 0:08.2. Distant gates stay thin posts."
     },
     {
       "id": "coherence",
       "title": "One frame",
       "status": "model in",
-      "round": 3,
+      "round": 916,
       "critic": "holds",
-      "gap": "The chase camera sees the tailgate of the Cybertruck mesh at about 40 m/s."
+      "gap": "The chase is one scene: tailgate, tracks, dust, and dunes at about 40 m/s."
     },
     {
       "id": "hud",
       "title": "Speed and minimap",
       "status": "on screen",
-      "round": 2,
+      "round": 916,
       "critic": "holds",
-      "gap": "Speed, timer, map, and the model credit are on screen."
+      "gap": "The HUD shot shows 143 km/h, the lap line, the timer, the map, and the hashikemu credit."
     },
     {
       "id": "audio",
