@@ -124,6 +124,37 @@ export function heightAt(x: number, z: number): number {
   return a * (1 - fz) + b * fz
 }
 
+type Collider = { x: number; z: number; r: number }
+const colliders: Collider[] = []
+
+export function pushOut(
+  x: number,
+  z: number,
+  radius: number,
+  rocks: readonly Collider[],
+): { x: number; z: number; hit: boolean } {
+  let hit = false
+  for (let pass = 0; pass < 2; pass++) {
+    for (const rock of rocks) {
+      const dx = x - rock.x
+      const dz = z - rock.z
+      const min = radius + rock.r
+      const distSq = dx * dx + dz * dz
+      if (distSq >= min * min) continue
+      const dist = Math.sqrt(distSq) || 0.0001
+      const push = (min - dist) / dist
+      x += dx * push
+      z += dz * push
+      hit = true
+    }
+  }
+  return { x, z, hit }
+}
+
+export function resolveRocks(x: number, z: number, radius: number): { x: number; z: number; hit: boolean } {
+  return pushOut(x, z, radius, colliders)
+}
+
 function nearTruckColor(x: number, z: number): [number, number, number] | null {
   const p = ellipsePoint(0.35)
   const dx = x - p.x
@@ -181,6 +212,15 @@ function groundColor(x: number, z: number): [number, number, number] {
   g = mix(g, 0.018, packed)
   b = mix(b, 0.012, packed)
   return [r, g, b]
+}
+
+function loadRepeat(url: string): THREE.Texture {
+  const tex = new THREE.TextureLoader().load(url)
+  tex.colorSpace = THREE.SRGBColorSpace
+  tex.wrapS = THREE.RepeatWrapping
+  tex.wrapT = THREE.RepeatWrapping
+  tex.anisotropy = 8
+  return tex
 }
 
 function detailTexture(): THREE.CanvasTexture {
@@ -257,6 +297,7 @@ function scatter(
   count: number,
   nearScale: number,
   farScale: number,
+  solid: boolean,
 ): void {
   const dummy = new THREE.Object3D()
   const color = new THREE.Color()
@@ -287,11 +328,12 @@ function scatter(
     dummy.scale.set(s * (0.72 + rand() * 0.55), sy, s * (0.7 + rand() * 0.6))
     dummy.updateMatrix()
     mesh.setMatrixAt(placed, dummy.matrix)
+    if (solid) colliders.push({ x, z, r: Math.max(s, sy) * 0.5 })
     const dust = rand()
     color.setRGB(
-      mix(0.28, 0.52, dust),
-      mix(0.2, 0.36, dust),
-      mix(0.14, 0.24, dust),
+      mix(0.82, 1.05, dust),
+      mix(0.78, 1.0, dust),
+      mix(0.72, 0.95, dust),
       THREE.SRGBColorSpace,
     )
     mesh.setColorAt(placed, color)
@@ -393,7 +435,10 @@ export function createTerrain(scene: THREE.Scene): Terrain {
     roughness: 0.96,
     metalness: 0,
   })
+  const sand = loadRepeat(`${import.meta.env.BASE_URL}textures/sand.jpg`)
+  const rockTex = loadRepeat(`${import.meta.env.BASE_URL}textures/rock.jpg`)
   mat.onBeforeCompile = (shader) => {
+    shader.uniforms.sandMap = { value: sand }
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
@@ -410,6 +455,7 @@ export function createTerrain(scene: THREE.Scene): Terrain {
         '#include <common>',
         `#include <common>
         varying vec3 vGritWorld;
+        uniform sampler2D sandMap;
         float gritHash(vec2 p) {
           vec3 q = fract(vec3(p.xyx) * 0.1031);
           q += dot(q, q.yzx + 33.33);
@@ -437,9 +483,8 @@ export function createTerrain(scene: THREE.Scene): Terrain {
           + gritNoise(gritXZ * 15.0 + 4.7) * 0.18;
         float gritSpeck = gritHash(floor(gritXZ * 140.0));
         gritN = mix(gritN, gritSpeck, 0.34);
-        vec3 gritDark = vec3(0.03, 0.008, 0.004);
-        vec3 gritPale = vec3(0.62, 0.2, 0.07);
-        vec3 grit = mix(gritDark, gritPale, clamp(gritN, 0.0, 1.0));
+        vec3 sandPhoto = texture2D(sandMap, gritXZ * 0.45).rgb;
+        vec3 grit = sandPhoto * mix(0.78, 1.2, clamp(gritN, 0.0, 1.0));
         diffuseColor.rgb = mix(diffuseColor.rgb, grit, gritFade);`,
       )
   }
@@ -453,6 +498,37 @@ export function createTerrain(scene: THREE.Scene): Terrain {
     roughness: 0.96,
     metalness: 0.02,
   })
+  rockMat.onBeforeCompile = (shader) => {
+    shader.uniforms.rockMap = { value: rockTex }
+    shader.vertexShader = shader.vertexShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        varying vec3 vRockWorld;`,
+      )
+      .replace(
+        '#include <project_vertex>',
+        `vRockWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;
+        #include <project_vertex>`,
+      )
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+        varying vec3 vRockWorld;
+        uniform sampler2D rockMap;`,
+      )
+      .replace(
+        '#include <color_fragment>',
+        `#include <color_fragment>
+        vec3 rockBlend = abs(normalize(vNormal));
+        rockBlend /= rockBlend.x + rockBlend.y + rockBlend.z + 0.0001;
+        vec3 rockPhoto = texture2D(rockMap, vRockWorld.yz * 0.7).rgb * rockBlend.x
+          + texture2D(rockMap, vRockWorld.xz * 0.7).rgb * rockBlend.y
+          + texture2D(rockMap, vRockWorld.xy * 0.7).rgb * rockBlend.z;
+        diffuseColor.rgb *= rockPhoto;`,
+      )
+  }
   const rockGeos = [11, 29, 47].map((seed) => makeRock(seed, 2))
   const pebbleGeo = makeRock(71, 2)
   const viewGeo = rockGeos[0]
@@ -466,13 +542,13 @@ export function createTerrain(scene: THREE.Scene): Terrain {
     const rocks = new THREE.InstancedMesh(rockGeo, rockMat, 52)
     rocks.castShadow = false
     rocks.receiveShadow = true
-    scatter(rocks, mulberry32(11 + index * 17), 52, 1.15, 4.2)
+    scatter(rocks, mulberry32(11 + index * 17), 52, 1.15, 4.2, true)
     scene.add(rocks)
   })
   const pebbles = new THREE.InstancedMesh(pebbleGeo, rockMat, 340)
   pebbles.castShadow = false
   pebbles.receiveShadow = true
-  scatter(pebbles, mulberry32(19), 340, 0.42, 0.85)
+  scatter(pebbles, mulberry32(19), 340, 0.42, 0.85, false)
   scene.add(pebbles)
 
   const mesaMat = new THREE.MeshStandardMaterial({

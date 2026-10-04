@@ -1,17 +1,87 @@
 {
-  "updatedAt": "2026-10-02T08:49:30-04:00",
-  "wave": 4,
-  "note": "Playable build. The Cybertruck model drives on the Jezero loop. Critic passes are stopped.",
+  "updatedAt": "2026-10-04T15:56:20-04:00",
+  "wave": 6,
+  "note": "The door row is still flat. A side-shot row is about 106 pixels of rgb(111, 79, 57). The chase frame shows the tailgate, two tracks, and dust at about 40 m/s.",
   "pieces": [
-    { "id": "sky", "title": "Martian sky and sun", "status": "streaks in", "round": 9, "critic": "seam gone", "gap": "The hard vertical seam is gone. Streaks still read, and a blue band stays on the left." },
-    { "id": "terrain", "title": "Regolith, craters, rocks", "status": "grit holds", "round": 10, "critic": "holds", "gap": "The sand beside the truck has many shades." },
-    { "id": "truck", "title": "Cybertruck mesh", "status": "playable", "round": 70, "critic": "holds", "gap": "The hashikemu Cybertruck is the hero mesh. The rear bar reads brighter than the tailgate." },
-    { "id": "drive", "title": "Weight, grip, camera", "status": "drives", "round": 3, "critic": "controls hold", "gap": "W, A, Space, and R move the truck." },
-    { "id": "dust", "title": "Wheel dust and tracks", "status": "tracks in", "round": 4, "critic": "holds", "gap": "Two dark tracks sit behind the tires." },
-    { "id": "grade", "title": "Shadows, grade, bloom", "status": "fringe gone", "round": 4, "critic": "holds", "gap": "The red and blue edge fringe is gone." },
-    { "id": "race", "title": "Loop, gates, timing", "status": "glow gone", "round": 2, "critic": "holds", "gap": "Eight gates on the Jezero ellipse." },
-    { "id": "coherence", "title": "One frame", "status": "model in", "round": 3, "critic": "holds", "gap": "The chase camera sees the tailgate of the Cybertruck mesh." },
-    { "id": "hud", "title": "Speed and minimap", "status": "on screen", "round": 2, "critic": "holds", "gap": "Speed, timer, map, and the model credit are on screen." },
-    { "id": "audio", "title": "Motor whine and wind", "status": "built", "round": 1, "critic": "holds", "gap": "Audio unlocks on the first key or click." }
+    {
+      "id": "sky",
+      "title": "Martian sky and sun",
+      "status": "streaks in",
+      "round": 9,
+      "critic": "seam gone",
+      "gap": "The hard vertical seam is gone. Streaks still read, and a blue band stays on the left."
+    },
+    {
+      "id": "terrain",
+      "title": "Regolith, craters, rocks",
+      "status": "textured",
+      "round": 11,
+      "critic": "holds",
+      "gap": "Near sand shows the Grok Imagine regolith. Rocks stop the truck."
+    },
+    {
+      "id": "truck",
+      "title": "Cybertruck mesh",
+      "status": "flat door",
+      "round": 867,
+      "critic": "loses",
+      "gap": "The hashikemu mesh holds and the tires meet the sand. A door row is still about 106 pixels of one color, rgb(111, 79, 57)."
+    },
+    {
+      "id": "drive",
+      "title": "Weight, grip, camera",
+      "status": "weighted",
+      "round": 5,
+      "critic": "holds",
+      "gap": "A and left steer left. D and right steer right. Full throttle still reaches about 15 m/s in two simulated seconds."
+    },
+    {
+      "id": "dust",
+      "title": "Wheel dust and tracks",
+      "status": "tracks in",
+      "round": 4,
+      "critic": "holds",
+      "gap": "Two dark tracks sit behind the tires in the chase frame."
+    },
+    {
+      "id": "grade",
+      "title": "Shadows, grade, bloom",
+      "status": "beams in",
+      "round": 5,
+      "critic": "holds",
+      "gap": "Headlights light the sand and the tail lamp shows in the chase frame."
+    },
+    {
+      "id": "race",
+      "title": "Loop, gates, timing",
+      "status": "glow gone",
+      "round": 2,
+      "critic": "holds",
+      "gap": "Eight gates on the Jezero ellipse."
+    },
+    {
+      "id": "coherence",
+      "title": "One frame",
+      "status": "model in",
+      "round": 3,
+      "critic": "holds",
+      "gap": "The chase camera sees the tailgate of the Cybertruck mesh at about 40 m/s."
+    },
+    {
+      "id": "hud",
+      "title": "Speed and minimap",
+      "status": "on screen",
+      "round": 2,
+      "critic": "holds",
+      "gap": "Speed, timer, map, and the model credit are on screen."
+    },
+    {
+      "id": "audio",
+      "title": "Motor whine and wind",
+      "status": "built",
+      "round": 1,
+      "critic": "holds",
+      "gap": "Audio unlocks on the first key or click."
+    }
   ]
 }

@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
-import { WHEEL_RADIUS, type VehicleState } from '../vehicle.ts'
+import type { VehicleState } from '../vehicle.ts'
 
 export type Truck = {
   group: THREE.Group
@@ -17,11 +17,34 @@ export function createTruck(scene: THREE.Scene): Truck {
   const group = new THREE.Group()
   const body = new THREE.Group()
   const model = new THREE.Group()
-  // The mesh sits on y=0. bodyY rests at the wheel radius, so drop the mesh by that much.
-  model.position.y = -WHEEL_RADIUS
+  // The mesh origin is the tire contact. bodyY rests one suspension lift above the sand.
+  model.position.y = -0.08
   body.add(model)
   group.add(body)
   scene.add(group)
+
+  const lamps = new THREE.Group()
+  const leftTarget = new THREE.Object3D()
+  const rightTarget = new THREE.Object3D()
+  leftTarget.position.set(18, -1.1, -0.72)
+  rightTarget.position.set(18, -1.1, 0.72)
+  const leftBeam = new THREE.SpotLight(0xffe6c8, 95, 46, 0.52, 0.72, 1.35)
+  const rightBeam = new THREE.SpotLight(0xffe6c8, 95, 46, 0.52, 0.72, 1.35)
+  leftBeam.position.set(2.55, 0.72, -0.72)
+  rightBeam.position.set(2.55, 0.72, 0.72)
+  for (const beam of [leftBeam, rightBeam]) {
+    beam.castShadow = true
+    beam.shadow.mapSize.set(512, 512)
+    beam.shadow.bias = -0.0008
+    beam.shadow.camera.near = 0.4
+    beam.shadow.camera.far = 40
+  }
+  leftBeam.target = leftTarget
+  rightBeam.target = rightTarget
+  const tail = new THREE.PointLight(0xff2414, 6, 11, 2)
+  tail.position.set(-2.75, 0.95, 0)
+  lamps.add(leftBeam, rightBeam, leftTarget, rightTarget, tail)
+  group.add(lamps)
 
   const materials: THREE.Material[] = []
   const loader = new GLTFLoader()
@@ -60,6 +83,7 @@ export function createTruck(scene: THREE.Scene): Truck {
       body.position.y = state.bodyY
       body.rotation.x = state.pitch
       body.rotation.z = state.roll
+      tail.intensity = 6 + state.slip * 34
     },
     update() {},
     dispose() {

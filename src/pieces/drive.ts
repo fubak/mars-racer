@@ -7,9 +7,11 @@ import {
   stepVehicle,
   wheelWorld,
   WHEEL_OFFSETS,
+  WHEEL_RADIUS,
   type VehicleInput,
   type VehicleState,
 } from '../vehicle.ts'
+import { resolveRocks } from './terrain.ts'
 
 export type Drive = {
   state: VehicleState
@@ -40,14 +42,13 @@ export function createDrive(
     if (auto) return autoInput(state)
     const throttle = keys.has('w') || keys.has('arrowup') ? 1 : 0
     const down = keys.has('s') || keys.has('arrowdown')
-    let brake = down && state.speed > 1 ? 1 : 0
+    let brake = down && state.speed > 1.2 ? 1 : 0
     let signedThrottle = throttle
-    if (down && state.speed <= 1) signedThrottle = -0.45
-    if (keys.has(' ') || keys.has('space')) brake = Math.max(brake, 1)
+    if (down && state.speed <= 1.2) signedThrottle = -0.55
     const steer =
-      (keys.has('a') || keys.has('arrowleft') ? 1 : 0) -
-      (keys.has('d') || keys.has('arrowright') ? 1 : 0)
-    const handbrake = keys.has(' ') ? 1 : 0
+      (keys.has('d') || keys.has('arrowright') ? 1 : 0) -
+      (keys.has('a') || keys.has('arrowleft') ? 1 : 0)
+    const handbrake = keys.has(' ') || keys.has('space') ? 1 : 0
     return { throttle: signedThrottle, brake, steer, handbrake }
   }
 
@@ -59,6 +60,10 @@ export function createDrive(
     }
     return [samples[0] ?? 0, samples[1] ?? 0, samples[2] ?? 0, samples[3] ?? 0]
   }
+
+  const planted = ground()
+  for (let i = 0; i < 4; i++) state.wheelY[i] = (planted[i] ?? 0) + WHEEL_RADIUS
+  state.bodyY = planted.reduce((sum, y) => sum + y, 0) / 4 + 0.08
 
   return {
     state,
@@ -74,7 +79,27 @@ export function createDrive(
         seeded = true
       }
       const step = Math.min(dt, 0.05)
+      const prevX = state.x
+      const prevZ = state.z
       stepVehicle(state, readInput(), step, ground())
+      const body = resolveRocks(state.x, state.z, 2.05)
+      if (body.hit) {
+        const vx = Math.cos(state.heading) * state.speed
+        const vz = Math.sin(state.heading) * state.speed
+        const ox = body.x - prevX
+        const oz = body.z - prevZ
+        const out = Math.hypot(ox, oz) || 1
+        if (vx * (ox / out) + vz * (oz / out) < 0) state.speed *= 0.2
+        state.x = body.x
+        state.z = body.z
+      }
+      const nose = wheelWorld(state.x, state.z, state.heading, 2.4, 0)
+      const noseHit = resolveRocks(nose.x, nose.z, 1.15)
+      if (noseHit.hit) {
+        state.x += noseHit.x - nose.x
+        state.z += noseHit.z - nose.z
+        state.speed *= 0.35
+      }
       truck.apply(state)
 
       if (shot === 'sky') {
@@ -121,7 +146,7 @@ export function createDrive(
       }
       anchorX = state.x
       anchorZ = state.z
-      const lerp = 1 - Math.exp(-dt * (shot === 'dust' ? 9 : 7))
+      const lerp = 1 - Math.exp(-dt * (shot === 'dust' ? 6.5 : 4.6))
       if (!seeded) {
         camPos.copy(desired)
         seeded = true
@@ -131,13 +156,13 @@ export function createDrive(
       if (camPos.y < minY) camPos.y = minY
       camera.position.copy(camPos)
       look.set(
-        state.x + c * 2.15,
+        state.x + c * 2.8,
         state.bodyY + 0.95,
         state.z + s * 2.15,
       )
       camera.up.set(state.roll * 0.35, 1, 0).normalize()
       camera.lookAt(look)
-      const fov = (shot === 'dust' ? 51 : 50) + Math.min(speed, 32) * 0.03
+      const fov = (shot === 'dust' ? 50 : 48) + Math.min(speed, 40) * 0.32
       if (Math.abs(camera.fov - fov) > 0.05) {
         camera.fov = fov
         camera.updateProjectionMatrix()

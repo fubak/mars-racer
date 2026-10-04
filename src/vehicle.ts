@@ -11,11 +11,13 @@ export const WHEEL_OFFSETS = [
 
 const MASS = 2990
 const MARS_G = 3.71
-const DRIVE_FORCE = 14500
-const BRAKE_FORCE = 19000
-const DRAG = 0.38
-const ROLL = 280
-const GRIP = 0.72
+const PEAK_FORCE = 26000
+const TOP_SPEED = 46
+const BRAKE_FORCE = 32000
+const ENGINE_BRAKE = 3800
+const DRAG = 0.45
+const ROLL = 220
+const GRIP = 1.35
 
 export type VehicleInput = {
   throttle: number
@@ -50,7 +52,7 @@ export function createVehicleState(): VehicleState {
     steerAngle: 0,
     yawRate: 0,
     slip: 0,
-    bodyY: WHEEL_RADIUS,
+    bodyY: 0.08,
     pitch: 0,
     roll: 0,
     wheelY: [WHEEL_RADIUS, WHEEL_RADIUS, WHEEL_RADIUS, WHEEL_RADIUS],
@@ -89,33 +91,44 @@ export function stepVehicle(
   ground: [number, number, number, number],
 ): VehicleState {
   const speedSign = state.speed === 0 ? 1 : Math.sign(state.speed)
-  const drive = input.throttle * DRIVE_FORCE
+  const speedAbsIn = Math.abs(state.speed)
+  const handbrake = input.handbrake > 0.5
+  const taper = 1 - 0.78 * Math.min(Math.max(state.speed, 0) / TOP_SPEED, 1)
+  const driveMul = (input.throttle >= 0 ? Math.max(taper, 0.22) : 0.4) * (handbrake ? 0.62 : 1)
+  const drive = input.throttle * PEAK_FORCE * driveMul
+  const braking = input.brake > 0.05
+  const coast = !braking && input.throttle === 0 && speedAbsIn > 0.15 ? ENGINE_BRAKE * speedSign : 0
   const brake = input.brake * BRAKE_FORCE * speedSign
   const drag = DRAG * state.speed * Math.abs(state.speed)
-  const roll = ROLL * (Math.abs(state.speed) > 0.2 ? speedSign : 0)
-  const force = drive - brake - drag - roll
+  const roll = ROLL * (speedAbsIn > 0.2 ? speedSign : 0)
+  const force = drive - brake - coast - drag - roll
   state.speed += (force / MASS) * dt
-  if (input.brake > 0.2 && Math.abs(state.speed) < 0.4) state.speed = 0
-  state.speed = Math.max(-16, Math.min(62, state.speed))
+  if (braking && Math.abs(state.speed) < 0.35) state.speed = 0
+  state.speed = Math.max(-12, Math.min(TOP_SPEED, state.speed))
 
   const speedAbs = Math.abs(state.speed)
-  const steerScale = 0.42 + 0.58 * (1 - Math.min(speedAbs / 38, 1))
-  const targetSteer = input.steer * 0.52 * steerScale
-  state.steerAngle += (targetSteer - state.steerAngle) * Math.min(1, dt * 8)
+  const steerScale = 0.045 + 0.5 * (1 - Math.min(speedAbs / 24, 1))
+  const targetSteer = input.steer * steerScale
+  const steerK = handbrake ? 12 : 8
+  state.steerAngle += (targetSteer - state.steerAngle) * Math.min(1, dt * steerK)
 
   let yaw = 0
-  if (speedAbs > 0.4) {
+  if (speedAbs > 0.35) {
     yaw = (state.speed / WHEELBASE) * Math.tan(state.steerAngle)
   }
-  const grip = GRIP * (input.handbrake > 0.5 ? 0.32 : 1)
-  const maxLat = grip * MARS_G
+  const maxLat = GRIP * MARS_G
   const lat = Math.abs(yaw * state.speed)
-  if (lat > maxLat && speedAbs > 1) {
-    yaw = Math.sign(yaw || state.steerAngle || 1) * (maxLat / speedAbs)
-    state.speed *= Math.exp(-dt * (input.handbrake > 0.5 ? 0.7 : 0.25))
-    state.slip = Math.min(1, lat / maxLat - 0.2)
+  if (handbrake && speedAbs > 3 && Math.abs(input.steer) > 0.15) {
+    const kick = Math.sign(input.steer) * Math.min(speedAbs, 26) * 0.085
+    yaw = Math.sign(state.speed || 1) * kick
+    state.speed *= Math.exp(-dt * 0.85)
+    state.slip = Math.min(1, 0.72 + Math.abs(input.steer) * 0.28)
+  } else if (lat > maxLat && speedAbs > 1.2) {
+    yaw = Math.sign(yaw || state.steerAngle || 1) * (maxLat / Math.max(speedAbs, 0.5))
+    state.speed *= Math.exp(-dt * 0.12)
+    state.slip = Math.min(1, (lat / maxLat - 1) * 0.6)
   } else {
-    state.slip = Math.max(0, state.slip - dt * 1.5)
+    state.slip = Math.max(0, state.slip - dt * 2.4)
   }
   state.yawRate = yaw
   state.heading = wrapAngle(state.heading + yaw * dt)
@@ -139,8 +152,10 @@ export function stepVehicle(
   const left = (state.wheelY[0] + state.wheelY[2]) * 0.5
   const right = (state.wheelY[1] + state.wheelY[3]) * 0.5
   const bodyTarget = sum / 4 - WHEEL_RADIUS + 0.08
-  const pitchTarget = (rear - front) * 0.18
-  const rollTarget = (left - right) * 0.22 - state.yawRate * state.speed * 0.004
+  const longAcc = force / MASS
+  const latAcc = state.yawRate * state.speed
+  const pitchTarget = Math.max(-0.09, Math.min(0.09, (rear - front) * 0.18 - longAcc * 0.007))
+  const rollTarget = Math.max(-0.14, Math.min(0.14, (left - right) * 0.22 - latAcc * 0.011))
   const k = Math.min(1, dt * 6)
   state.bodyY += (bodyTarget - state.bodyY) * k
   state.pitch += (pitchTarget - state.pitch) * k

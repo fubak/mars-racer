@@ -1,0 +1,47 @@
+{
+  "loop": "running",
+  "stoppedBecause": null,
+  "resumeWhen": "The user asks to continue the critic loop.",
+  "nextRound": 868,
+  "lastRound": 867,
+  "updatedAt": "2026-10-04T15:56:20-04:00",
+  "devServer": "http://127.0.0.1:5173/",
+  "progressPage": "http://127.0.0.1:5173/progress.html",
+  "shotUrls": [
+    "http://127.0.0.1:5173/?shot=truck&t=0",
+    "http://127.0.0.1:5173/?shot=hero&t=8"
+  ],
+  "chrome": {
+    "debugger": "http://127.0.0.1:9222/json/list",
+    "lastGameTabId": "863A2A03BA7061464ABE62CC031E4751",
+    "lastProgressTabId": "389B6C91195176B8C393B86DBBF07923",
+    "note": "Confirm the game tab from json/list before connecting. Do not launch Chrome on 9222."
+  },
+  "lastTruck": {
+    "ready": true,
+    "shot": "truck",
+    "speed": 0,
+    "slip": 0,
+    "x": 300.5992681111612,
+    "z": 68.57956149109027,
+    "heading": 2.0994020364340997,
+    "doorRowY": 576,
+    "doorRunPx": 106,
+    "doorColor": [111, 79, 57],
+    "longestRunPx": 343,
+    "longestRunY": 654,
+    "longestRunColor": [115, 78, 49]
+  },
+  "lastHero": {
+    "ready": true,
+    "shot": "hero",
+    "speed": 39.61030163787044,
+    "speedSpoken": "about 40 m/s",
+    "slip": 0,
+    "pose": "tailgate",
+    "x": 147.41983397342594,
+    "z": 182.6059162693497,
+    "heading": 2.825131649393669
+  },
+  "wakePrompt": "Continue the Mars racer critic cycle. Screenshot http://127.0.0.1:5173/?shot=truck&t=0 and ?shot=hero&t=8 yourself and look at the pixels. Do not trust builder summaries. The truck is the hashikemu glTF. Do not replace that loader. Do not revert src/vehicle.ts. The door row is still one flat shade; do not send a roughness pass on the material named body, and do not start a second writer if truck.ts is being edited. Update public/progress.json."
+}
